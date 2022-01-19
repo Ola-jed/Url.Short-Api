@@ -1,7 +1,8 @@
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Url.Short_Api.Data;
 using Url.Short_Api.Dto;
+using Url.Short_Api.Entities;
+using Url.Short_Api.Extensions;
 using Url.Short_Api.Services.Pagination;
 
 namespace Url.Short_Api.Services.UrlShortenRepository;
@@ -9,41 +10,40 @@ namespace Url.Short_Api.Services.UrlShortenRepository;
 public class UrlShortenRepositoryService : IUrlShortenRepositoryService
 {
     private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
 
-    public UrlShortenRepositoryService(AppDbContext context, IMapper mapper)
+    public UrlShortenRepositoryService(AppDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
     public async Task<IEnumerable<UrlShortenReadDto>> GetAll(PageParameters pageParameters)
     {
-        var urlShortens = await _context.UrlShortens.AsNoTracking()
-            .Paginate(pageParameters);
-        return _mapper.Map<IEnumerable<UrlShortenReadDto>>(urlShortens);
+        return await _context.UrlShortens.AsNoTracking()
+            .Paginate(pageParameters)
+            .MapTo<UrlShorten,UrlShortenReadDto>()
+            .ToListAsync();
     }
 
     public async Task<UrlShortenReadDto?> GetById(int id)
     {
-        var urlShorten = await _context.UrlShortens.AsNoTracking()
+        return await _context.UrlShortens.AsNoTracking()
+            .MapTo<UrlShorten,UrlShortenReadDto>()
             .FirstOrDefaultAsync(u => u.Id == id);
-        return urlShorten == null ? null : _mapper.Map<UrlShortenReadDto>(urlShorten);
     }
 
     public async Task<UrlShortenReadDto?> GetByShortUrl(string shortUrl)
     {
-        var urlShorten = await _context.UrlShortens.AsNoTracking()
+        return await _context.UrlShortens.AsNoTracking()
+            .MapTo<UrlShorten,UrlShortenReadDto>()
             .FirstOrDefaultAsync(u => u.ShortUrl == shortUrl);
-        return urlShorten == null ? null : _mapper.Map<UrlShortenReadDto>(urlShorten);
     }
 
     public async Task<IEnumerable<UrlShortenReadDto>> FindByUrl(string url)
     {
-        var urls = await _context.UrlShortens.AsNoTracking()
+        return await _context.UrlShortens.AsNoTracking()
             .Where(u => EF.Functions.Like(u.Url, $"%{url}%"))
+            .MapTo<UrlShorten,UrlShortenReadDto>()
             .ToListAsync();
-        return _mapper.Map<IEnumerable<UrlShortenReadDto>>(urls);
     }
 
     public async Task<bool> Exists(int id)

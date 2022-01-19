@@ -5,12 +5,11 @@ namespace Url.Short_Api.Services.Pagination;
 
 public static class PaginationExtensions
 {
-    public static async Task<IEnumerable<TEntity>> Paginate<TEntity>(this IQueryable<TEntity> self,
+    public static IQueryable<TEntity> Paginate<TEntity>(this IQueryable<TEntity> self,
         PageParameters parameters) where TEntity : Entity
     {
-        return await self.OrderBy(entity => entity.Id)
+        return self.OrderBy(entity => entity.Id)
             .Skip(parameters.Offset)
-            .Take(parameters.PerPage)
-            .ToListAsync();
+            .Take(parameters.PerPage);
     }
 }

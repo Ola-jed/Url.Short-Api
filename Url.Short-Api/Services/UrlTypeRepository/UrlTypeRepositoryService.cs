@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Url.Short_Api.Data;
 using Url.Short_Api.Dto;
 using Url.Short_Api.Entities;
+using Url.Short_Api.Extensions;
 using Url.Short_Api.Services.Pagination;
 
 namespace Url.Short_Api.Services.UrlTypeRepository;
@@ -11,7 +12,7 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
 {
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
-
+    
     public UrlTypeRepositoryService(AppDbContext context, IMapper mapper)
     {
         _context = context;
@@ -20,14 +21,18 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
 
     public async Task<IEnumerable<UrlTypeReadDto>> GetAll(PageParameters pageParameters)
     {
-        var urlTypes = await _context.UrlTypes.AsNoTracking().Paginate(pageParameters);
-        return _mapper.Map<IEnumerable<UrlTypeReadDto>>(urlTypes);
+        return await _context.UrlTypes
+            .AsNoTracking()
+            .Paginate(pageParameters)
+            .MapTo<UrlType,UrlTypeReadDto>()
+            .ToListAsync();
     }
 
     public async Task<UrlTypeReadDto?> GetById(int id)
     {
-        var urlType = await _context.UrlTypes.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-        return _mapper.Map<UrlTypeReadDto>(urlType);
+        return await _context.UrlTypes.AsNoTracking()
+            .MapTo<UrlType,UrlTypeReadDto>()
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<IEnumerable<UrlShortenReadDto>> GetUsages(int id)
@@ -41,10 +46,10 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
             return Enumerable.Empty<UrlShortenReadDto>();
         }
 
-        var urlShortens = _context.UrlShortens.AsNoTracking()
+        return await _context.UrlShortens.AsNoTracking()
             .Where(u => EF.Functions.Like(u.Url, $"%{urlTypeDomain}%"))
+            .MapTo<UrlShorten,UrlShortenReadDto>()
             .ToListAsync();
-        return _mapper.Map<IEnumerable<UrlShortenReadDto>>(urlShortens);
     }
 
     public async Task<bool> Exists(int id)
@@ -54,18 +59,18 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
 
     public async Task<IEnumerable<UrlTypeReadDto>> FindByDomain(string domain)
     {
-        var urlTypes = await _context.UrlTypes.AsNoTracking()
+        return await _context.UrlTypes.AsNoTracking()
             .Where(u => EF.Functions.Like(u.Domain, $"%{domain}%"))
+            .MapTo<UrlType,UrlTypeReadDto>()
             .ToListAsync();
-        return _mapper.Map<IEnumerable<UrlTypeReadDto>>(urlTypes);
     }
 
     public async Task<IEnumerable<UrlTypeReadDto>> FindByShortName(string shortName)
     {
-        var urlTypes = await _context.UrlTypes.AsNoTracking()
+        return await _context.UrlTypes.AsNoTracking()
             .Where(u => EF.Functions.Like(u.ShortName, $"%{shortName}%"))
+            .MapTo<UrlType,UrlTypeReadDto>()
             .ToListAsync();
-        return _mapper.Map<IEnumerable<UrlTypeReadDto>>(urlTypes);
     }
 
     public async Task<UrlTypeReadDto> Create(UrlTypeCreateDto urlTypeCreateDto)
