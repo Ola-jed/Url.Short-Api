@@ -14,7 +14,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuth(tokenKey);
 builder.Services.AddSwagger();
-builder.Services.AddMapper();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();

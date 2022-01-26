@@ -1,13 +1,11 @@
 using System.Reflection;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using Url.Short_Api.Data;
-using Url.Short_Api.Data.Profiles;
 
 namespace Url.Short_Api.Extensions;
 
@@ -88,16 +86,6 @@ public static class ServiceCollectionExtensions
                     ValidateAudience = false
                 };
             });
-    }
-
-    public static void AddMapper(this IServiceCollection serviceCollection)
-    {
-        var mapperConfig = new MapperConfiguration(m =>
-        {
-            m.AddProfile<UrlShortenProfile>();
-            m.AddProfile<UrlTypeProfile>();
-        });
-        serviceCollection.AddSingleton(mapperConfig.CreateMapper());
     }
 
     public static void AddPgsql(this IServiceCollection serviceCollection,

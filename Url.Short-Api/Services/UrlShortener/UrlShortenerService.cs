@@ -1,31 +1,28 @@
 using System.Text;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Url.Short_Api.Data;
 using Url.Short_Api.Dto;
-using Url.Short_Api.Entities;
+using Url.Short_Api.Mapping;
 
 namespace Url.Short_Api.Services.UrlShortener;
 
 public class UrlShortenerService: IUrlShortenerService
 {
     private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
-    
-    public UrlShortenerService(AppDbContext context, IMapper mapper)
+
+    public UrlShortenerService(AppDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
     
     public async Task<UrlShortenReadDto> ShortenUrl(UrlShortenCreateDto urlShortenCreateDto)
     {
-        var urlShorten = _mapper.Map<UrlShorten>(urlShortenCreateDto);
+        var urlShorten = urlShortenCreateDto.ToUrlShorten();
         urlShorten.ShortUrl = await GenerateUrlToken(urlShorten.Url);
         urlShorten.CreatedAt = DateTime.Now;
         var urlShortenEntityEntry = _context.UrlShortens.Add(urlShorten);
         await _context.SaveChangesAsync();
-        return _mapper.Map<UrlShortenReadDto>(urlShortenEntityEntry.Entity);
+        return urlShortenEntityEntry.Entity.ToUrlShortenReadDto();
     }
 
     public async Task UpdateShortenUrl(int id, UrlShortenUpdateDto urlShortenUpdateDto)
@@ -35,7 +32,9 @@ public class UrlShortenerService: IUrlShortenerService
         {
             return;
         }
-        _mapper.Map(urlShortenUpdateDto, urlShorten);
+
+        urlShorten.Url = urlShortenUpdateDto.Url;
+        urlShorten.LifetimeInHours = urlShortenUpdateDto.LifetimeInHours;
         urlShorten.ShortUrl = await GenerateUrlToken(urlShorten.Url);
         _context.Update(urlShorten);
         await _context.SaveChangesAsync();

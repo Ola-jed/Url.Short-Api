@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Url.Short_Api.Data;
 using Url.Short_Api.Dto;
-using Url.Short_Api.Entities;
-using Url.Short_Api.Extensions;
+using Url.Short_Api.Mapping;
 using Url.Short_Api.Services.Pagination;
 
 namespace Url.Short_Api.Services.UrlShortenRepository;
@@ -20,21 +19,21 @@ public class UrlShortenRepositoryService : IUrlShortenRepositoryService
     {
         return await _context.UrlShortens.AsNoTracking()
             .Paginate(pageParameters)
-            .MapTo<UrlShorten,UrlShortenReadDto>()
+            .ToUrlShortenReadDto()
             .ToListAsync();
     }
 
     public async Task<UrlShortenReadDto?> GetById(int id)
     {
         return await _context.UrlShortens.AsNoTracking()
-            .MapTo<UrlShorten,UrlShortenReadDto>()
+            .ToUrlShortenReadDto()
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<UrlShortenReadDto?> GetByShortUrl(string shortUrl)
     {
         return await _context.UrlShortens.AsNoTracking()
-            .MapTo<UrlShorten,UrlShortenReadDto>()
+            .ToUrlShortenReadDto()
             .FirstOrDefaultAsync(u => u.ShortUrl == shortUrl);
     }
 
@@ -42,7 +41,7 @@ public class UrlShortenRepositoryService : IUrlShortenRepositoryService
     {
         return await _context.UrlShortens.AsNoTracking()
             .Where(u => EF.Functions.Like(u.Url, $"%{url}%"))
-            .MapTo<UrlShorten,UrlShortenReadDto>()
+            .ToUrlShortenReadDto()
             .ToListAsync();
     }
 
