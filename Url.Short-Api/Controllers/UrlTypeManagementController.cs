@@ -1,7 +1,9 @@
+using FluentPaginator.Lib.Page;
+using FluentPaginator.Lib.Parameter;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Url.Short_Api.Dto;
-using Url.Short_Api.Services.Pagination;
 using Url.Short_Api.Services.UrlTypeRepository;
 
 namespace Url.Short_Api.Controllers;
@@ -25,9 +27,10 @@ public class UrlTypeManagementController : ControllerBase
     /// <param name="perPage"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<IEnumerable<UrlTypeReadDto>> GetAll([FromQuery] int page = 1, [FromQuery] int perPage = 15)
+    public async Task<UrlPage<UrlTypeReadDto>> GetAll([FromQuery] int page = 1, [FromQuery] int perPage = 15)
     {
-        var pageParameters = new PageParameters(perPage, page);
+        var url = HttpContext.Request.GetEncodedUrl();
+        var pageParameters = new UrlPaginationParameter(perPage, page, url, nameof(page), nameof(perPage));
         return await _urlTypeRepositoryService.GetAll(pageParameters);
     }
 

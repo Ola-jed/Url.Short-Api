@@ -1,8 +1,10 @@
+using FluentPaginator.Lib.Extensions;
+using FluentPaginator.Lib.Page;
+using FluentPaginator.Lib.Parameter;
 using Microsoft.EntityFrameworkCore;
 using Url.Short_Api.Data;
 using Url.Short_Api.Dto;
 using Url.Short_Api.Mapping;
-using Url.Short_Api.Services.Pagination;
 
 namespace Url.Short_Api.Services.UrlTypeRepository;
 
@@ -15,13 +17,12 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
         _context = context;
     }
 
-    public async Task<IEnumerable<UrlTypeReadDto>> GetAll(PageParameters pageParameters)
+    public async Task<UrlPage<UrlTypeReadDto>> GetAll(UrlPaginationParameter urlPaginationParameter)
     {
-        return await _context.UrlTypes
+        return await Task.Run(() => _context.UrlTypes
             .AsNoTracking()
-            .Paginate(pageParameters)
             .ToUrlTypeReadDto()
-            .ToListAsync();
+            .UrlPaginate(urlPaginationParameter, u => u.Id));
     }
 
     public async Task<UrlTypeReadDto?> GetById(int id)

@@ -1,11 +1,12 @@
+using FluentPaginator.Lib.Page;
+using FluentPaginator.Lib.Parameter;
 using Url.Short_Api.Dto;
-using Url.Short_Api.Services.Pagination;
 
 namespace Url.Short_Api.Services.UrlTypeRepository;
 
 public interface IUrlTypeRepositoryService
 {
-    Task<IEnumerable<UrlTypeReadDto>> GetAll(PageParameters pageParameters);
+    Task<UrlPage<UrlTypeReadDto>> GetAll(UrlPaginationParameter urlPaginationParameter);
     Task<UrlTypeReadDto?> GetById(int id);
     Task<IEnumerable<UrlShortenReadDto>> GetUsages(int id);
     Task<bool> Exists(int id);

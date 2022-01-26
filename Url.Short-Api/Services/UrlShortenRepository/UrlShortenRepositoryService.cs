@@ -1,8 +1,10 @@
+using FluentPaginator.Lib.Extensions;
+using FluentPaginator.Lib.Page;
+using FluentPaginator.Lib.Parameter;
 using Microsoft.EntityFrameworkCore;
 using Url.Short_Api.Data;
 using Url.Short_Api.Dto;
 using Url.Short_Api.Mapping;
-using Url.Short_Api.Services.Pagination;
 
 namespace Url.Short_Api.Services.UrlShortenRepository;
 
@@ -15,12 +17,11 @@ public class UrlShortenRepositoryService : IUrlShortenRepositoryService
         _context = context;
     }
 
-    public async Task<IEnumerable<UrlShortenReadDto>> GetAll(PageParameters pageParameters)
+    public async Task<UrlPage<UrlShortenReadDto>> GetAll(UrlPaginationParameter urlPaginationParameter)
     {
-        return await _context.UrlShortens.AsNoTracking()
-            .Paginate(pageParameters)
+        return await Task.Run(() => _context.UrlShortens.AsNoTracking()
             .ToUrlShortenReadDto()
-            .ToListAsync();
+            .UrlPaginate(urlPaginationParameter, u => u.Id));
     }
 
     public async Task<UrlShortenReadDto?> GetById(int id)

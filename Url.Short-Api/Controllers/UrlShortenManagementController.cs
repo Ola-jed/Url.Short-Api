@@ -1,7 +1,9 @@
+using FluentPaginator.Lib.Page;
+using FluentPaginator.Lib.Parameter;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Url.Short_Api.Dto;
-using Url.Short_Api.Services.Pagination;
 using Url.Short_Api.Services.UrlShortener;
 using Url.Short_Api.Services.UrlShortenRepository;
 
@@ -29,9 +31,10 @@ public class UrlShortenManagementController : ControllerBase
     /// <param name="perPage">The number of items per page</param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<IEnumerable<UrlShortenReadDto>> GetAll([FromQuery] int page = 1, [FromQuery] int perPage = 15)
+    public async Task<UrlPage<UrlShortenReadDto>> GetAll([FromQuery] int page = 1, [FromQuery] int perPage = 15)
     {
-        var pageParam = new PageParameters(perPage, page);
+        var url = HttpContext.Request.GetEncodedUrl();
+        var pageParam = new UrlPaginationParameter(perPage, page, url, nameof(page), nameof(perPage));
         return await _repositoryService.GetAll(pageParam);
     }
 
