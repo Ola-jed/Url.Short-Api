@@ -29,7 +29,7 @@ public class UrlTypeManagementController : ControllerBase
     [HttpGet]
     public async Task<UrlPage<UrlTypeReadDto>> GetAll([FromQuery] int page = 1, [FromQuery] int perPage = 15)
     {
-        var url = HttpContext.Request.GetEncodedUrl();
+        var url = HttpContext.Request.GetDisplayUrl().Split('?')[0];
         var pageParameters = new UrlPaginationParameter(perPage, page, url, nameof(page), nameof(perPage));
         return await _urlTypeRepositoryService.GetAll(pageParameters);
     }

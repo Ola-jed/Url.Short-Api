@@ -33,7 +33,7 @@ public class UrlShortenManagementController : ControllerBase
     [HttpGet]
     public async Task<UrlPage<UrlShortenReadDto>> GetAll([FromQuery] int page = 1, [FromQuery] int perPage = 15)
     {
-        var url = HttpContext.Request.GetEncodedUrl();
+        var url = HttpContext.Request.GetDisplayUrl().Split('?')[0];
         var pageParam = new UrlPaginationParameter(perPage, page, url, nameof(page), nameof(perPage));
         return await _repositoryService.GetAll(pageParam);
     }
