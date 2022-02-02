@@ -25,6 +25,20 @@ public class UrlShortenerService: IUrlShortenerService
         return urlShortenEntityEntry.Entity.ToUrlShortenReadDto();
     }
 
+    public async Task<UrlShortenReadDto> CustomShortenUrl(UrlShortenCustomCreateDto urlShortenCustomCreateDto)
+    {
+        var urlShorten = urlShortenCustomCreateDto.ToUrlShorten();
+        urlShorten.CreatedAt = DateTime.Now;
+        var urlShortenEntityEntry = _context.UrlShortens.Add(urlShorten);
+        await _context.SaveChangesAsync();
+        return urlShortenEntityEntry.Entity.ToUrlShortenReadDto();
+    }
+
+    public async Task<bool> ShortUrlExists(string shortUrl)
+    {
+        return await _context.UrlShortens.AnyAsync(x => x.ShortUrl == shortUrl);
+    }
+
     public async Task UpdateShortenUrl(int id, UrlShortenUpdateDto urlShortenUpdateDto)
     {
         var urlShorten = await _context.UrlShortens.FindAsync(id);

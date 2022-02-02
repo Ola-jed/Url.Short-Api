@@ -7,11 +7,11 @@ namespace Url.Short_Api.Controllers;
 
 [Route("url.short")]
 [ApiController]
-public class UrlShortenerController: ControllerBase
+public class UrlShortenerController : ControllerBase
 {
     private readonly IUrlShortenerService _urlShortenerService;
     private readonly IUrlShortenRepositoryService _shortenRepositoryService;
-    
+
     public UrlShortenerController(IUrlShortenerService urlShortenerService,
         IUrlShortenRepositoryService shortenRepositoryService)
     {
@@ -24,7 +24,7 @@ public class UrlShortenerController: ControllerBase
     /// </summary>
     /// <param name="urlToken">The url token schema</param>
     /// <returns></returns>
-    [HttpGet("{urlToken}",Name = "Get")]
+    [HttpGet("{urlToken}", Name = "Get")]
     [ProducesResponseType(StatusCodes.Status301MovedPermanently)]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status307TemporaryRedirect)]
@@ -42,9 +42,30 @@ public class UrlShortenerController: ControllerBase
     /// <param name="urlShortenCreateDto">Data for the shortened url</param>
     /// <returns></returns>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<UrlShortenReadDto>> Post(UrlShortenCreateDto urlShortenCreateDto)
     {
         var shorten = await _urlShortenerService.ShortenUrl(urlShortenCreateDto);
-        return CreatedAtRoute(nameof(Get),new {UrlToken = shorten.ShortUrl},shorten);
+        return CreatedAtRoute(nameof(Get), new { UrlToken = shorten.ShortUrl }, shorten);
+    }
+
+    /// <summary>
+    /// Create a shorten url with a custom url
+    /// </summary>
+    /// <param name="urlShortenCustomCreateDto">The custom data</param>
+    /// <returns></returns>
+    [HttpPost("Custom")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<UrlShortenCustomCreateDto>> CreateCustom(
+        UrlShortenCustomCreateDto urlShortenCustomCreateDto)
+    {
+        if (await _urlShortenerService.ShortUrlExists(urlShortenCustomCreateDto.ShortUrl))
+        {
+            return BadRequest();
+        }
+
+        var shorten = await _urlShortenerService.CustomShortenUrl(urlShortenCustomCreateDto);
+        return CreatedAtRoute(nameof(Get), new { UrlToken = shorten.ShortUrl }, shorten);
     }
 }
