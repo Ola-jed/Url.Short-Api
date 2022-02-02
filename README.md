@@ -29,4 +29,3 @@ dotnet run
 
 - [ ] Host on [Azure](https://azure.microsoft.com)
 - [ ] Write unit tests
-- [ ] Caching implementation
