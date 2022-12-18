@@ -19,9 +19,11 @@ public class UrlShortenRepositoryService : IUrlShortenRepositoryService
 
     public async Task<UrlPage<UrlShortenReadDto>> GetAll(UrlPaginationParameter urlPaginationParameter)
     {
-        return await Task.Run(() => _context.UrlShortens.AsNoTracking()
-            .ToUrlShortenReadDto()
-            .UrlPaginate(urlPaginationParameter, u => u.Id));
+        return await Task.Run(() => _context.UrlShortens
+            .AsNoTracking()
+            .UrlPaginate(urlPaginationParameter, u => u.Id)
+            .Map(x => x.ToUrlShortenReadDto())
+        );
     }
 
     public async Task<UrlShortenReadDto?> GetById(int id)
@@ -53,13 +55,8 @@ public class UrlShortenRepositoryService : IUrlShortenRepositoryService
 
     public async Task DeleteById(int id)
     {
-        var urlShorten = await _context.UrlShortens.FindAsync(id);
-        if (urlShorten == null)
-        {
-            return;
-        }
-
-        _context.UrlShortens.Remove(urlShorten);
-        await _context.SaveChangesAsync();
+        await _context.UrlShortens
+            .Where(x => x.Id == id)
+            .ExecuteDeleteAsync();
     }
 }

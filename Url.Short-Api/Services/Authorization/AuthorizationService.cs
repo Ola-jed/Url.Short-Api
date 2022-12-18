@@ -13,8 +13,8 @@ public class AuthorizationService: IAuthorizationService
 
     public AuthorizationService(IConfiguration configuration)
     {
-        _appSecret = configuration["AppSecret"];
-        _tokenKey = configuration["TokenKey"];
+        _appSecret = configuration["AppSecret"]!;
+        _tokenKey = configuration["TokenKey"]!;
     }
 
     public async Task<bool> ValidateAppSecret(string secret)
@@ -22,7 +22,7 @@ public class AuthorizationService: IAuthorizationService
         return await Task.FromResult(_appSecret == secret);
     }
 
-    public async Task<string> GenerateJwt()
+    public Task<string> GenerateJwt()
     {
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -33,10 +33,11 @@ public class AuthorizationService: IAuthorizationService
             Expires = DateTime.UtcNow.AddHours(JwtLifetimeInHours),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_tokenKey)),
-                SecurityAlgorithms.HmacSha256Signature)
+                SecurityAlgorithms.HmacSha256Signature
+            )
         };
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return await Task.FromResult(tokenHandler.WriteToken(token));
+        return Task.FromResult(tokenHandler.WriteToken(token));
     }
 }

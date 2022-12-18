@@ -21,8 +21,9 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
     {
         return await Task.Run(() => _context.UrlTypes
             .AsNoTracking()
-            .ToUrlTypeReadDto()
-            .UrlPaginate(urlPaginationParameter, u => u.Id));
+            .UrlPaginate(urlPaginationParameter, u => u.Id)
+            .Map(x => x.ToUrlTypeReadDto())
+        );
     }
 
     public async Task<UrlTypeReadDto?> GetById(int id)
@@ -80,26 +81,15 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
 
     public async Task Update(int id, UrlTypeUpdateDto urlTypeUpdateDto)
     {
-        var urlType = await _context.UrlTypes.FindAsync(id);
-        if (urlType == null)
-        {
-            return;
-        }
-
-        urlType.Domain = urlTypeUpdateDto.Domain;
-        urlType.ShortName = urlTypeUpdateDto.ShortName;
-        await _context.SaveChangesAsync();
+        await _context.UrlTypes
+            .Where(x => x.Id == id)
+            .ExecuteUpdateAsync(x => x.SetProperty(u => u.ShortName, urlTypeUpdateDto.ShortName)
+                .SetProperty(u => u.Domain, urlTypeUpdateDto.Domain)
+            );
     }
 
     public async Task Delete(int id)
     {
-        var urlType = await _context.UrlTypes.FindAsync(id);
-        if (urlType == null)
-        {
-            return;
-        }
-
-        _context.UrlTypes.Remove(urlType);
-        await _context.SaveChangesAsync();
+        await _context.UrlTypes.Where(x => x.Id == id).ExecuteDeleteAsync();
     }
 }

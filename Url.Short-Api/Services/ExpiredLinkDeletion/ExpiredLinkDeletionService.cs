@@ -34,8 +34,9 @@ public sealed class ExpiredLinkDeletionService : IHostedService, IDisposable
         _logger.LogInformation("{} is deleting expired links", nameof(ExpiredLinkDeletionService));
         using var scope = _scopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var entriesCount = context.Database.ExecuteSqlInterpolated(
-            $"DELETE FROM \"UrlShortens\" WHERE \"LifetimeInHours\" > 0 AND \"CreatedAt\" < {DateTime.Now} - (\"LifetimeInHours\" * interval '1 hour') ");
+        var entriesCount = context.UrlShortens
+            .Where(x => x.LifetimeInHours > 0 && x.CreatedAt < DateTime.Now.AddHours(-1.0 * x.LifetimeInHours.Value))
+            .ExecuteDelete();
         _logger.LogInformation("{} deleted {} expired links", nameof(ExpiredLinkDeletionService), entriesCount);
     }
     
