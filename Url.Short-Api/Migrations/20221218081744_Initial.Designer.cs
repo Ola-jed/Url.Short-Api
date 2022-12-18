@@ -9,17 +9,18 @@ using Url.Short_Api.Data;
 
 #nullable disable
 
-namespace Url.Short_Api.Migrations
+namespace Url.ShortApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220115072935_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20221218081744_Initial")]
+    partial class Initial
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("ProductVersion", "7.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -33,7 +34,7 @@ namespace Url.Short_Api.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("LifetimeInHours")
                         .HasColumnType("integer");
