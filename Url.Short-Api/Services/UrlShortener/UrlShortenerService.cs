@@ -41,17 +41,13 @@ public class UrlShortenerService: IUrlShortenerService
 
     public async Task UpdateShortenUrl(int id, UrlShortenUpdateDto urlShortenUpdateDto)
     {
-        var urlShorten = await _context.UrlShortens.FindAsync(id);
-        if (urlShorten == null)
-        {
-            return;
-        }
-
-        urlShorten.Url = urlShortenUpdateDto.Url;
-        urlShorten.LifetimeInHours = urlShortenUpdateDto.LifetimeInHours;
-        urlShorten.ShortUrl = await GenerateUrlToken(urlShorten.Url);
-        _context.Update(urlShorten);
-        await _context.SaveChangesAsync();
+        var shortUrl = await GenerateUrlToken(urlShortenUpdateDto.Url);
+        await _context.UrlShortens
+            .Where(x => x.Id == id)
+            .ExecuteUpdateAsync(x => x.SetProperty(s => s.Url, urlShortenUpdateDto.Url)
+                .SetProperty(s => s.ShortUrl, shortUrl)
+                .SetProperty(s => s.LifetimeInHours, urlShortenUpdateDto.LifetimeInHours)
+            );
     }
 
     private async Task<string> GenerateUrlToken(string url)
