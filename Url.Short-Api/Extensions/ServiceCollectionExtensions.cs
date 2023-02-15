@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
             {
                 Title = "Url Shortener API",
                 Version = "v1",
-                Description = "Application to shorten urls",
+                Description = "Api to shorten urls",
                 Contact = new OpenApiContact
                 {
                     Name = "Olabissi Gbangboche",

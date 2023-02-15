@@ -14,15 +14,6 @@ public static class UrlShortenMappingExtensions
             urlShorten.CreatedAt);
     }
 
-    public static UrlShorten ToUrlShorten(this UrlShortenUpdateDto urlShortenUpdateDto)
-    {
-        return new UrlShorten
-        {
-            Url = urlShortenUpdateDto.Url,
-            LifetimeInHours = urlShortenUpdateDto.LifetimeInHours
-        };
-    }
-    
     public static UrlShorten ToUrlShorten(this UrlShortenCreateDto urlShortenCreateDto)
     {
         return new UrlShorten
