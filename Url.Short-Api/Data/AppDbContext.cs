@@ -10,20 +10,6 @@ public class AppDbContext : DbContext
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<UrlShorten>()
-            .HasIndex(u => u.ShortUrl)
-            .IsUnique();
-        modelBuilder.Entity<UrlType>()
-            .HasIndex(u => u.Domain)
-            .IsUnique();
-        modelBuilder.Entity<UrlType>()
-            .HasIndex(u => u.ShortName)
-            .IsUnique();
-    }
-    
     public DbSet<UrlShorten> UrlShortens { get; set; } = null!;
     public DbSet<UrlType> UrlTypes { get; set; } = null!;
 }

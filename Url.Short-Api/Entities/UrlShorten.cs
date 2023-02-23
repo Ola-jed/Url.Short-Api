@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Url.Short_Api.Entities;
 
+[Index(nameof(ShortUrl), IsUnique = true)]
 public class UrlShorten: Entity
 {
     [Required] [Url] public string Url { get; set; } = string.Empty;
