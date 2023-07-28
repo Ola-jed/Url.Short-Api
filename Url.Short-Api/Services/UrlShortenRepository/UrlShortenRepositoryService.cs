@@ -19,11 +19,11 @@ public class UrlShortenRepositoryService : IUrlShortenRepositoryService
 
     public async Task<UrlPage<UrlShortenReadDto>> GetAll(UrlPaginationParameter urlPaginationParameter)
     {
-        return await Task.Run(() => _context.UrlShortens
+        var page = await _context.UrlShortens
             .AsNoTracking()
-            .UrlPaginate(urlPaginationParameter, u => u.Id)
-            .Map(x => x.ToUrlShortenReadDto())
-        );
+            .AsyncUrlPaginate(urlPaginationParameter, u => u.Id);
+        
+        return page.Map(x => x.ToUrlShortenReadDto());
     }
 
     public async Task<UrlShortenReadDto?> GetById(int id)

@@ -19,11 +19,11 @@ public class UrlTypeRepositoryService : IUrlTypeRepositoryService
 
     public async Task<UrlPage<UrlTypeReadDto>> GetAll(UrlPaginationParameter urlPaginationParameter)
     {
-        return await Task.Run(() => _context.UrlTypes
+        var page = await _context.UrlTypes
             .AsNoTracking()
-            .UrlPaginate(urlPaginationParameter, u => u.Id)
-            .Map(x => x.ToUrlTypeReadDto())
-        );
+            .AsyncUrlPaginate(urlPaginationParameter, u => u.Id);
+        
+        return page.Map(x => x.ToUrlTypeReadDto());
     }
 
     public async Task<UrlTypeReadDto?> GetById(int id)
